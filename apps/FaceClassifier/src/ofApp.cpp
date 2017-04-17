@@ -1,4 +1,5 @@
 #include "ofApp.h"
+#include "glm/glm.hpp"
 
 const ofColor backgroundPlotColor = ofColor(50,50,50,255);
 
@@ -92,7 +93,7 @@ void ofApp::update(){
             auto facePoints = tracker.getInstances()[0].getLandmarks().getImageFeature(ofxFaceTracker2Landmarks::ALL_FEATURES);
             
             for (int i = 0; i<facePoints.size(); i++) {
-                ofPoint p = facePoints.getVertices()[i].getNormalized(); //only values from 0-1. Experiment with this, and try to send non-normalized as well
+                ofPoint p = glm::normalize(facePoints.getVertices()[i]); //only values from 0-1. Experiment with this, and try to send non-normalized as well
                 
                 inputVector[i] = p.x;
                 inputVector[i + facePoints.size()] = p.y; //Not that elegant...
@@ -231,7 +232,9 @@ float ofApp:: getGesture (Gesture gesture){
     
     
     //Normalized
-    return (gestureMultiplier*abs(abs(tracker.getInstances()[0].getLandmarks().getImagePoint(start).getNormalized().y - tracker.getInstances()[0].getLandmarks().getImagePoint(end).getNormalized().y)));
+    glm::vec2 normalizedStartPoint = glm::normalize(tracker.getInstances()[0].getLandmarks().getImagePoint(start));
+    glm::vec2 normalizedEndPoint = glm::normalize(tracker.getInstances()[0].getLandmarks().getImagePoint(end));
+    return (gestureMultiplier * abs(normalizedStartPoint.y - normalizedEndPoint.y));
     
     
 }
